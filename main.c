@@ -1,9 +1,9 @@
 /*
 Start: 2/17/2020
-End:
+End:3/12/2020
 Goal: Make a GA guess my password
-
 */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -12,9 +12,6 @@ Goal: Make a GA guess my password
 #include <math.h>
 #include <time.h>
 
-//Prototypes
-//void CreatePopMem(char**,char**,int,int);
-//void FillPopMem(char **,char **,int,int);
 int Evaluate(char *,char[]);
 char * Selection(char **,char[],int, int);
 char * Crossover (char *,char *,int);
@@ -22,22 +19,18 @@ char * Mutation(char *,int);
 void FreeMemory(char **,int);
 char * FindBest(char **,int,char[],int);
 
-
-
 int main(void)
 {
-    char **newPopulation;
-    char **oldPopulation;
-    char *parent0;
-    char *parent1;
+    char **newPopulation, **oldPopulation;
+    char *parent0, *parent1;
     char *kid, *best;
     int popSize = 50, x = 1;
     char answer[50] = "i like apples";
     int length = strlen(answer), count = 0;
-    printf("length %d", length);
     char vocab[] = "abcdefghijklmnopqrstuvwxyz ";
     int vocabLength = 27;
     srand(time(NULL));
+//Setting aside memory
 //=================================================================
     parent0 = (char*)malloc(length * sizeof(char*));
     parent1 = (char*)malloc(length * sizeof(char*));
@@ -50,6 +43,7 @@ int main(void)
        newPopulation[i] = (char*)malloc((length) * sizeof(char));
        oldPopulation[i] = (char*)malloc((length) * sizeof(char));
     }
+//Fill population
 //==================================================================
     for(int i = 0; i < popSize; i++)
     {
@@ -59,23 +53,18 @@ int main(void)
         }
         oldPopulation[i][length] = '\0';
     }
+ // Run until user stops the program
  //==================================================================
      while(x)
      {
-         //printf("while\n");
         for(int i = 0; i < 50; i++)
         {
             count+=1;
-            //printf("First for loop\n");
             for(int j = 0; j < popSize; j++)
             {
-                //printf("Second for loop\n");
                 parent0 = Selection(oldPopulation, answer, length, popSize);
-                //printf("Parent 0: %s\n", parent0);
                 parent1 = Selection(oldPopulation, answer, length, popSize);
-                //printf("Parent 1: %s\n", parent1);
                 kid = Crossover(parent0, parent1, length);
-                //printf("Kid: %s, #%d\n", kid, count++);
                 newPopulation[j] = Mutation(kid, length);
                 printf("individual -> %s : %d\n", newPopulation[j], count);
             }
@@ -84,8 +73,6 @@ int main(void)
             for(int j = 0; j < popSize; j++)
             {
                 oldPopulation[j] = newPopulation[j];
-                //printf("%s == %s : %d\n", oldPopulation[j], newPopulation[j], j);
-                //printf("Old pop -> %s : %d\n", oldPopulation[j], j);
             }
         }
     }
@@ -93,6 +80,8 @@ int main(void)
     FreeMemory(oldPopulation, popSize);
     return 0;
 }
+
+//Evaluates each individual by comparing each gene in the individual
 //==================================================================
 int Evaluate(char *individual, char answer[])
 {
@@ -107,12 +96,14 @@ int Evaluate(char *individual, char answer[])
     return eval;
 }
 
+//Selects two parents from the population given and returns the individual with the better evaluation
 char * Selection(char **population, char answer[], int length, int popSize)
 {
     char *temp1, *temp2, *choice;
     temp1 = (char*)malloc(length * sizeof(char*));
     temp2 = (char*)malloc(length * sizeof(char*));
     choice = (char*)malloc(length * sizeof(char*));
+    //Setting temp1 & 2 to a random individual in the population given
     temp1 = population[rand() % popSize];
     temp2 = population[rand() % popSize];
 
@@ -124,10 +115,10 @@ char * Selection(char **population, char answer[], int length, int popSize)
     {
        choice = temp2;
     }
-    //printf("Made it though selection\n");
     return choice;
 }
 
+//Splits the parents in half and gives half of each parent to the child
 char * Crossover (char *parent0,char *parent1, int length)
 {
     char * newInd;
@@ -145,10 +136,10 @@ char * Crossover (char *parent0,char *parent1, int length)
             newInd[i] = parent1[i];
         }
     }
-    //printf("Made it through crossover\n");
     return newInd;
 }
 
+//Goes through each individual's genes and picks a number between 0 and 100 if its less than two then it mutates that gene
 char * Mutation (char *newInd, int length)
 {
     int randNum = 0;
@@ -168,6 +159,7 @@ char * Mutation (char *newInd, int length)
     return newInd;
 }
 
+//Frees memory of population given
 void FreeMemory(char **oldPop, int popSize)
 {
     for(int i = 0; i < popSize; i++)
@@ -177,7 +169,7 @@ void FreeMemory(char **oldPop, int popSize)
     free(oldPop);
 }
 
-//Doing this wrong. Evaluate the entire population to find the best.
+//Finds the best individual in each generation
 char * FindBest(char** population, int popSize, char answer[], int length)
 {
     int currentBest = 0;
